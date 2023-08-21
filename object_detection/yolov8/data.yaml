@@ -1,0 +1,5 @@
+path: ../../input/data
+train: train/images
+val: val/images
+nc: 10
+names: [sunglass, hat, jacket, shirt, pants, shorts, skirt, dress, bag, shoe]
