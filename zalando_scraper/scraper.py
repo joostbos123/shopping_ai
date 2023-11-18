@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
+from ast import literal_eval
 
 ZALANDO_HOME_PAGE = 'https://www.zalando.nl'
 
@@ -116,7 +117,7 @@ for product in products:
 
 # Get information and images for each product
 try:
-    df_products = pd.read_csv('data/products.csv')
+    df_products = pd.read_csv('data/products.csv', converters={'image_urls': literal_eval})
     print('Adding to existing products data')
 except:
     df_products = pd.DataFrame(columns=['id', 'name', 'url', 'category', 'brand', 'color', 'price'])
@@ -172,20 +173,28 @@ for i, product in enumerate(products_clean):
         if (i % 100) == 0:
             df_products.to_csv('data/products.csv', index=False)
 
+df_products.to_csv('data/products.csv', index=False)
 
-# Download image for each product in the dataset
+
+
+# Download images for each product in the dataset
+df_products = pd.read_csv('data/products.csv', converters={'image_urls': literal_eval})
 for _, row in df_products.iterrows():
-    image_id = 1
     product_image_dir = f'data/images/product_{"{:04d}".format(row["id"])}'
-    os.mkdir(product_image_dir)
-    for image_url in row['image_urls']:
 
-        response = requests.get(image_url)
-        if response.status_code == 200:
-            with open(f'{product_image_dir}/image_{"{:02d}".format(image_id)}.jpg', 'wb') as file:
-                file.write(response.content)
+    # Create folder to store the downloaded images when it does not exist
+    if not os.path.exists(product_image_dir):
+        os.makedirs(product_image_dir)
 
-            image_id += 1
+        image_id = 1
+        for image_url in row['image_urls']:
+            try:
+                response = requests.get(image_url)
 
-        else:
-            print(f'Failed to download image with for {image_url}')
+                with open(f'{product_image_dir}/image_{"{:02d}".format(image_id)}.jpg', 'wb') as file:
+                    file.write(response.content)
+
+                image_id += 1
+
+            except:
+                print(f'Failed to download image for {image_url}')

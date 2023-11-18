@@ -1,1 +1,4 @@
-object_detection/datasets/*
+zalando_scraper/data/*
+*.xml
+*.pt
+legacy/*
