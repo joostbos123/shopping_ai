@@ -3,7 +3,6 @@ from PIL import Image
 import weaviate
 import os
 
-
 from helpers import (
     convert_image_to_base64,
     convert_image_to_array,
@@ -21,7 +20,7 @@ CLASS_MAPPING = {
     # "shirt": "shirt",
     # "shoes": "shoes",
     # "bag": "bag",
-    # "glasses": "glasses",
+    "glasses": "glasses",
 }
 
 SEGMENTATION = False
@@ -36,6 +35,7 @@ if not WEAVIATE_URL:
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "/temp_images"
 client = weaviate.Client(WEAVIATE_URL)
+
 
 if client.is_ready():
     # Defining the pages that will be on the website
@@ -75,15 +75,21 @@ if client.is_ready():
             # Search for similar products
             search_results = weaviate_img_search(client, search_image_str)
 
-            for result in search_results:
-                content.append(
-                    {
+            content.append(
+                {
+                    "class": class_name,
+                    "polygon": polygon,
+                    "results":
+                    [
+                        {
                         "image_str": result["image"],
                         "product": result["product"],
                         "url": result["url"],
-                        "polygon": polygon,
-                    }
-                )
+                        }
+                        for result in search_results
+                    ]
+                }
+            )
 
         print(f"\n {content} \n")
         return render_template(

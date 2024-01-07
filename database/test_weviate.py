@@ -20,7 +20,7 @@ with open(search_image_path, "rb") as image_file:
     encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
 search_image = {"image": encoded_string}
 weaviate_results = (
-    client.query.get("ZalandoProduct", ["image", "product", "url"])
+    client.query.get("ZalandoProduct", ["image", "product", "url", "filepath"])
     .with_near_image(search_image, encode=False)
     .with_limit(2)
     .do()

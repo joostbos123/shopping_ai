@@ -10,20 +10,26 @@
             <input type="submit">
             {% if search_image %}
             <br/>
-            <img class="uploadedImg" 
+            <img class="searchImage" 
                  src="data:image/jpeg;base64, {{search_image}}"
             />
+            <canvas id="imagePolygonCanvas"></canvas>
+            <script src="scripts/DrawPolygons.js"></script>
             {% endif %}
         </form>
     </div>
         
     <h2>RESULTS</h2>
-    <div class = "showColumn">
-        {% for x in content %}
-        <div class="imgCard">
-            <img src = "data:image/jpeg;base64, {{ x['image_str'] }}" alt="image"> </img>
-            <h4> {{ x["product"] }} </h4>
-            <h4> {{ x["url"] }} </h4>
+    <div class>
+        {% for item in content %}
+        <div class="showColumn">
+            {% for result in item["results"] %}
+            <div class="imgCard">
+                <img src = "data:image/jpeg;base64, {{ result['image_str'] }}" alt="image"> </img>
+                <h4> {{ result["product"] }} </h4>
+                <h4> {{ result["url"] }} </h4>
+            </div>
+            {% endfor %}
         </div>
         {% endfor %}
     </div>

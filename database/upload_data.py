@@ -18,7 +18,7 @@ client = weaviate.Client(
     # auth_client_secret=auth_config,
 )
 
-df_products = pd.read_csv(PATH_DATA_PRODUCTS, nrows=1000)
+df_products = pd.read_csv(PATH_DATA_PRODUCTS)
 
 client.batch.configure(
     batch_size=100,
@@ -33,19 +33,23 @@ with client.batch as batch:  # Initialize a batch process
         print(f"importing product: {index_product + 1}")
         for image in os.listdir(f"{PATH_DATA_IMAGES_FOLDER}/product_{'%04d'%row['id']}"):
 
-            # Read image and convert to base64
-            image_path = f"{PATH_DATA_IMAGES_FOLDER}/product_{'%04d'%row['id']}/{image}"
-            with open(image_path, "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+            try:
+                # Read image and convert to base64
+                image_path = f"{PATH_DATA_IMAGES_FOLDER}/product_{'%04d'%row['id']}/{image}"
+                with open(image_path, "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
 
-            properties = {
-                "product": row["name"],
-                "url": row["url"],
-                "category": row["category"],
-                "brand": row["brand"],
-                "color": row["color"],
-                "price": float(row["price"].replace(",", ".")),
-                "image": encoded_string,
-                "filepath": image_path,
-            }
-            batch.add_data_object(data_object=properties, class_name="ZalandoProduct")
+                properties = {
+                    "product": row["name"],
+                    "url": row["url"],
+                    "category": row["category"],
+                    "brand": row["brand"],
+                    "color": row["color"],
+                    "price": float(row["price"].replace(",", ".")),
+                    "image": encoded_string,
+                    "filepath": image_path,
+                }
+                batch.add_data_object(data_object=properties, class_name="ZalandoProduct")
+
+            except:
+                print(f"Error importing image: {image_path}")

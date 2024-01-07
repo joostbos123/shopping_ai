@@ -32,7 +32,7 @@ def weaviate_img_search(client, img_str):
     weaviate_results = (
         client.query.get("ZalandoProduct", ["image", "product", "url"])
         .with_near_image(sourceImage, encode=False)
-        .with_limit(2)
+        .with_limit(8)
         .do()
     )
 
